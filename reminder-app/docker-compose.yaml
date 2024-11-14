@@ -1,0 +1,36 @@
+services:
+    app:
+        build: .
+        ports:
+            - "3000:3000"
+        depends_on:
+            - mongo
+        environment:
+            - MONGO_URI=mongodb://mongo:27017/reminders
+        networks:
+            - reminder-network
+
+    mongo:
+        image: mongo:8.0
+        volumes:
+            - mongo-data:/data/db
+        networks:
+            - reminder-network
+
+    nginx:
+        image: nginx:latest
+        ports:
+            - "80:80"
+        volumes:
+            - ./public:/usr/share/nginx/html # Serve frontend files
+            - ./nginx.conf:/etc/nginx/conf.d/default.conf # Use custom nginx config
+        depends_on:
+            - app
+        networks:
+            - reminder-network
+
+volumes:
+    mongo-data:
+
+networks:
+    reminder-network:
