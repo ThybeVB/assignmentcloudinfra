@@ -1,6 +1,5 @@
 const apiUrl = "/api/reminders";
 
-// Load all reminders
 function loadReminders() {
     $.ajax({
         url: apiUrl,
@@ -28,7 +27,6 @@ function loadReminders() {
     });
 }
 
-// Function to handle adding a reminder
 function addReminderHandler(e) {
     e.preventDefault();
     const title = $("#title").val();
@@ -50,7 +48,6 @@ function addReminderHandler(e) {
     });
 }
 
-// Bind the form submission to the add handler
 $("#reminder-form").submit(addReminderHandler);
 
 // Edit a reminder
@@ -82,7 +79,7 @@ $(document).on("click", ".edit-btn", function () {
                 success: function () {
                     $("#reminder-form")[0].reset();
                     loadReminders();
-                    $("#reminder-form").off("submit").submit(addReminderHandler); // Re-bind the form to add functionality
+                    $("#reminder-form").off("submit").submit(addReminderHandler);
                 },
                 error: function () {
                     alert("Could not update reminder.");
@@ -91,7 +88,6 @@ $(document).on("click", ".edit-btn", function () {
         });
 });
 
-// Delete a reminder
 $(document).on("click", ".delete-btn", function () {
     const row = $(this).closest("tr");
     const id = row.data("id");
@@ -100,7 +96,7 @@ $(document).on("click", ".delete-btn", function () {
         url: `${apiUrl}/${id}`,
         method: "DELETE",
         success: function () {
-            loadReminders();
+            row.remove();
         },
         error: function () {
             alert("Could not delete reminder.");
@@ -108,5 +104,4 @@ $(document).on("click", ".delete-btn", function () {
     });
 });
 
-// Initial load
 loadReminders();

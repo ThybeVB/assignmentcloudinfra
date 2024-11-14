@@ -70,8 +70,8 @@ app.delete("/reminders/:id", async (req, res) => {
     try {
         const reminder = await Reminder.findById(req.params.id);
         if (!reminder) return res.status(404).json({ message: "Reminder not found" });
-
-        res.json(await reminder.remove());
+        await Reminder.deleteOne({ _id: req.params.id });
+        res.status(200);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
