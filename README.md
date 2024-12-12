@@ -2,7 +2,7 @@
 
 # Cloud Infrastructure - Reminder App
 
-In deze repository beschrijven we het proces van een simpele Node.js app naar een applicatie die als cluster kan worden gedeployed. Dit evolueert doorheen verschillende software oplossingen.
+In deze repository beschrijven we het proces van een simpele Node.js app naar een applicatie die als cluster kan worden gedeployed. Dit evolueert doorheen verschillende software oplossingen. Standaard wordt een WSL2 Ubuntu 24.04 machine gebruikt om alle commando's uit te voeren. 
 
 ## Reminder App
 
@@ -25,8 +25,20 @@ docker buildx create --use
 docker buildx build --platform linux/amd64,linux/arm64 -t reminder-app .
 
 #Pushen naar Docker Hub
-todo
+docker build -t thybevb/reminder-app:latest .
+docker images -> image id kopieren
+docker tag <image-id> thybevb/reminder-app:latest
+docker push ThybeVB/reminder-app:latest
 ```
+
+## Minikube
+
+Om Minikube te installeren (in mijn geval op WSL2 Ubuntu), moet ook Docker Engine draaien op de machine om als driver te werken bij Minikube. Daarna kunnen we Minikube starten.
+
+```console
+minikube start --driver=docker
+```
+
 
 ## Terraform
 
@@ -38,7 +50,7 @@ Om Terraform te installeren gebruiken we Chocolatey for Windows. Dit is een pack
 
 Om via Terraform te deployen naar OCI (Oracle Cloud Infrastructure) zullen we de OCI CLI moeten installeren. Deze CLI zal automatisch een token maken die later zal worden gebruikt in Terraform. Volgende commando's tonen hoe dit wordt geïnstalleerd.
 
-```console
+```powershell
 Set-ExecutionPolicy RemoteSigned
 Invoke-WebRequest https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.ps1 -OutFile install.ps1
 iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.ps1'))
@@ -46,7 +58,7 @@ iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercon
 
 Om dit alternatief in Linux te doen, is het maar één commando. Om dat ik redelijk wat problemen had met de Windows versie koos ik ervoor dit in Ubuntu te doen.
 
-```console
+```bash
 bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)"
 ```
 
@@ -55,7 +67,7 @@ Eenmaal de CLI is geïnstalleerd, kunnen we de sessie met OCI initializeren.
 
 Door een tutorial van OCI/Terraform te volgen maken we een basisconfiguratie voor het deployen met OCI. De SecurityToken wordt gehaald uit de machine met de cli, en de compartment_id wordt gehaald uit een `secrets.auto.tfvars` file.
 
-```console
+```bash
 terraform {
   required_providers {
     oci = {
@@ -86,8 +98,3 @@ variable "compartment_id" {
 Na ```terraform apply``` uit te voeren zien we dat in Oracle een VCN werd gemaakt.
 ![VCN Created](./md-images/terraform-vcn-1.png.png)
 
-## Minikube
-
-```console
-minikube start --driver=docker
-```
