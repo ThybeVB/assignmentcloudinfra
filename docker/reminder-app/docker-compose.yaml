@@ -22,8 +22,8 @@ services:
         ports:
             - "80:80"
         volumes:
-            - ./public:/usr/share/nginx/html # Serve frontend files
-            - ./nginx.conf:/etc/nginx/conf.d/default.conf # Use custom nginx config
+            - ./public:/usr/share/nginx/html
+            - ./nginx.conf:/etc/nginx/conf.d/default.conf
         depends_on:
             - app
         networks:
