@@ -1,27 +1,25 @@
 terraform {
   required_providers {
-    docker = {
-      source  = "kreuzwerker/docker"
-      version = "~> 3.0.1"
+    oci = {
+      source = "oracle/oci"
     }
   }
 }
 
-provider "docker" {
-  host    = "npipe:////.//pipe//docker_engine"
+provider "oci" {
+  region              = "eu-amsterdam-1"
+  auth                = "SecurityToken"
+  config_file_profile = "profile"
 }
 
-resource "docker_image" "nginx" {
-  name         = "nginx"
-  keep_locally = false
+resource "oci_core_vcn" "internal" {
+  dns_label      = "internal"
+  cidr_block     = "172.16.0.0/20"
+  compartment_id = var.compartment_id
+  display_name   = "My internal VCN"
 }
 
-resource "docker_container" "nginx" {
-  image = docker_image.nginx.image_id
-  name  = "tutorial"
-
-  ports {
-    internal = 80
-    external = 8000
-  }
+variable "compartment_id" {
+  type      = string
+  sensitive = true
 }
