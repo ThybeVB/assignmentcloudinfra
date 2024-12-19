@@ -31,7 +31,7 @@ docker tag <image-id> thybevb/reminder-app:latest
 docker push ThybeVB/reminder-app:latest
 ```
 
-## Minikube
+## Minikube / Kubernetes
 
 Om Minikube te installeren (in mijn geval op WSL2 Ubuntu), moet ook Docker Engine draaien op de machine om als driver te werken bij Minikube. Daarna kunnen we Minikube starten.
 
@@ -39,12 +39,52 @@ Om Minikube te installeren (in mijn geval op WSL2 Ubuntu), moet ook Docker Engin
 minikube start --driver=docker
 ```
 
+Met een werkende Minikube kunnen we beginnen met onze Kubernetes te maken. Om dat we in het deel over Docker onze image hebben gepushed op Docker Hub, kan ik in Kubernetes een deployment file maken hiervoor. Dit kan ook voor onze andere nodige services; mongo en nginx. Dit is een overzicht van de gemaakte bestanden:
+
+- app-deployment.yaml
+- mongo-deployment.yaml
+  - mongo-storage.yaml
+- website-configmap.yaml
+- nginx-deployment.yaml
+  - nginxconfig-configmap.yaml
+
+Elk deployment bestand bevat een Deployment en een Service onderdeel. Dit kan ook opgesplist worden met een services bestand, maar ik vond dit overzichtelijker om het in hetzelfde bestand te zetten. Merk ook op dat er config bestanden zijn. Deze zijn ondersteundende configbestanden voor de deployments. We kunnen al de scripten applyen via het `apply.sh` bestand.
+
+```bash
+#!/bin/bash
+
+# Config maken voor de MongoDB deployment
+# mongo-storage voor persistent data
+minikube kubectl -- apply -f mongo-storage.yaml
+minikube kubectl -- apply -f mongo-deployment.yaml
+
+# Config maken voor het nginx config bestand
+minikube kubectl -- apply -f nginxconfig-configmap.yaml
+
+# Config maken met de website bestanden. Daarna ze applyen
+minikube kubectl -- create configmap reminder-app-frontend --from-file=../docker/reminder-app/public -o yaml --dry-run=client > website-configmap.yaml
+minikube kubectl -- apply -f website-configmap.yaml
+
+# NodeJS API, dan Webserver
+minikube kubectl -- apply -f app-deployment.yaml
+minikube kubectl -- apply -f nginx-deployment.yaml
+```
+Merk op dat de volgorde hier belangrijk is. mongo-deployment kan bijvoorbeeld niet werken als het ondersteundende storage bestand nog niet werd geapplyed.
+
+Wanneer we het apply script uitvoeren worden onze pods en services gemaakt. Enkel nginx wordt exposed op onze localhost. De andere services kunnen enkel aan elkaar. 
+
+Om de LoadBalancer nginx een External IP te geven, kunnen we `minikube tunnel` uitvoeren om een tunnel aan te maken van de kubernetes node naar onze host.
+
+Een kort overzicht van de runnende pods en services:
+![Pods](./md-images/pods.png)
+![Services](./md-images/svc.png)
+
+In de web browser van de host zien we onze werkende website.
+![Website in Minikube](./md-images/minikube-site.png)
 
 ## Terraform
 
-Om Terraform te installeren gebruiken we Chocolatey for Windows. Dit is een package manager die ons toelaat makkelijk applicaties te installeren zonder zelf bv. PATHs aan te moeten passen.
-
-![Chocolatey Terraform](./md-images/terraform_chocolatey.png)
+Om Terraform te installeren 
 
 ### Oracle OCI Integratie
 
