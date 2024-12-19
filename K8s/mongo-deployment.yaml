@@ -17,6 +17,14 @@ spec:
                   image: mongo:8.0
                   ports:
                       - containerPort: 27017
+                  volumeMounts:
+                      - mountPath: /data/db
+                        name: mongo-storage
+            volumes:
+                - name: mongo-storage
+                  persistentVolumeClaim:
+                    claimName: mongo-pvc
+
 ---
 apiVersion: v1
 kind: Service
@@ -29,4 +37,3 @@ spec:
         - protocol: TCP
           port: 27017
           targetPort: 27017
-    type: ClusterIP

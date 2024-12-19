@@ -34,4 +34,5 @@ spec:
         - protocol: TCP
           port: 3000
           targetPort: 3000
-    type: LoadBalancer
+    #type: LoadBalancer # In nginx wordt reverse proxy ingesteld, dus api kan in principe afgeschermd worden
+    type: ClusterIP
