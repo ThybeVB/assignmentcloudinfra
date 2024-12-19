@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
     name: app-deployment
     labels:
-    app: reminder-app
+        app: reminder-app
 spec:
     replicas: 1
     selector:
@@ -16,9 +16,12 @@ spec:
         spec:
             containers:
                 - name: reminder-app
-                  image: reminder-app:latest
+                  image: thybevb/reminder-app:latest
                   ports:
                       - containerPort: 3000
+                  env:
+                      - name: MONGO_URI
+                        value: "mongodb://mongo-service:27017/reminders"
 ---
 apiVersion: v1
 kind: Service
@@ -31,4 +34,4 @@ spec:
         - protocol: TCP
           port: 3000
           targetPort: 3000
-    type: NodePort
+    type: LoadBalancer
