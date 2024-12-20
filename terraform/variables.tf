@@ -12,7 +12,7 @@ variable "availability_domain" {
 
 }
 
-variable "PATH_TO_PUBLIC_KEY" {
+variable "public_key" {
   type        = string
   default     = "~/.ssh/id_rsa.pub"
 }

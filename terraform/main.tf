@@ -22,6 +22,6 @@ resource "oci_core_instance" "oracle_linux_instance" {
   }
 
   metadata = {
-    ssh_authorized_keys = file(var.PATH_TO_PUBLIC_KEY)
+    ssh_authorized_keys = file(var.public_key)
   }
 }
