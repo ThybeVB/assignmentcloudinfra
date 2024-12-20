@@ -107,7 +107,7 @@ Eenmaal de CLI is geïnstalleerd, kunnen we de sessie met OCI initializeren.
 
 Door een tutorial van OCI/Terraform te volgen maken we een basisconfiguratie voor het deployen met OCI. De SecurityToken wordt gehaald uit de machine met de cli, en de compartment_id wordt gehaald uit een `secrets.auto.tfvars` file.
 
-```bash
+```terraform
 terraform {
   required_providers {
     oci = {

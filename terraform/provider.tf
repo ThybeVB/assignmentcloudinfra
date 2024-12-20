@@ -7,7 +7,7 @@ terraform {
 }
 
 provider "oci" {
-  region              = "eu-amsterdam-1"
+  region              = var.region
   auth                = "SecurityToken"
   config_file_profile = "permanent"
 }
