@@ -1,27 +1,40 @@
-resource "oci_core_vcn" "internal" {
-  dns_label      = "internal"
-  cidr_block     = "172.16.0.0/20"
-  compartment_id = var.compartment_id
-  display_name   = "Reminder App VCN"
-}
-
-resource "oci_core_instance" "oracle_linux_instance" {
-  availability_domain = var.availability_domain
+# Cluster
+resource "oci_containerengine_cluster" "oke-cluster" {
   compartment_id      = var.compartment_id
-  shape               = var.shape
+  kubernetes_version  = var.kubernetes_version
+  name                = var.cluster_name
+  vcn_id              = oci_core_vcn.internal.id
+} 
 
-  display_name = "Oracle-Linux-Instance"
-
-  source_details {
-    source_id   = var.os_image_id
-    source_type = "image"
-  }
-
-  create_vnic_details {
-    subnet_id = var.public_subnet_id
-  }
-
-  metadata = {
-    ssh_authorized_keys = file(var.public_key)
-  }
+# Node pool
+resource "oci_containerengine_node_pool" "oke-node-pool" {
+    cluster_id = oci_containerengine_cluster.oke-cluster.id
+    compartment_id = oci_containerengine_cluster.oke-cluster.compartment_id
+    kubernetes_version = oci_containerengine_cluster.oke-cluster.kubernetes_version
+    name = "pool-1"
+    node_config_details{
+        placement_configs{
+            availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
+            subnet_id = oci_core_subnet.worker_subnet.id
+        } 
+        placement_configs{
+            availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
+            subnet_id = oci_core_subnet.worker_subnet.id
+        }
+         placement_configs{
+            availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
+            subnet_id = oci_core_subnet.worker_subnet.id
+        }
+        size = 3
+    }
+    node_shape = var.shape
+    
+    node_source_details {
+         image_id = var.os_image_id
+         source_type = "image"
+    }
+ 
+    node_metadata = {
+      ssh_authorized_keys = file(var.public_key)
+    }   
 }

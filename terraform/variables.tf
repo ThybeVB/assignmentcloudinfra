@@ -1,3 +1,8 @@
+variable "cluster_name" {
+  type = string
+  default = "reminder-app-cluster"
+}
+
 variable "compartment_id" {
   type      = string
   sensitive = true
@@ -10,6 +15,11 @@ variable "region" {
 
 variable "availability_domain" {
 
+}
+
+variable kubernetes_version {
+  type = string
+  default = "v1.32"
 }
 
 variable "public_key" {
@@ -40,7 +50,7 @@ variable "default_fault_domain" {
 }
 
 variable "os_image_id" {
-  default = "ocid1.image.oc1.eu-amsterdam-1.aaaaaaaaxx563fxzlxnu2kpgsq66okj7hb6qprhof2xwggcl54erovurlxxq"
+  type = string
 }
 
 variable "shape" {
