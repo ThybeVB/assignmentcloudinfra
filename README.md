@@ -86,3 +86,6 @@ In de web browser van de host zien we onze werkende website.
 
 Voor aanvullende informatie over Terraform, zie [Terraform](./terraform/EXTRA_INFO.md)
 
+terraform apply
+
+oci ce cluster create-kubeconfig --cluster-id $(terraform output -raw cluster_id) --file $HOME/.kube/config --region $(terraform output -raw region)
