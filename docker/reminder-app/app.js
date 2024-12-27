@@ -7,7 +7,7 @@ const app = express();
 
 app.use(bodyParser.json());
 
-const mongoUri = process.env.MONGO_URI || "mongodb://localhost/db/reminders";
+const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/reminders";
 mongoose.connect(mongoUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
