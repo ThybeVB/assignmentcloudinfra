@@ -82,6 +82,12 @@ Een kort overzicht van de runnende pods en services:
 In de web browser van de host zien we onze werkende website.
 ![Website in Minikube](./md-images/minikube-site.png)
 
+## Helm
+
+$ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+$ chmod 700 get_helm.sh
+$ ./get_helm.sh
+
 ## Terraform
 
 Voor aanvullende informatie over Terraform, zie [Terraform](./terraform/EXTRA_INFO.md)
