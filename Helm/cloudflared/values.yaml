@@ -1,3 +1,3 @@
 cloudflared:
-  tunnel-name: "kubernetes-tunnel" # {{ .Values.cloudflared.tunnel-name }}
+  tunnelname: "kubernetes-tunnel" # {{ .Values.cloudflared.tunnelname }}
   hostname: "cloud.thybevb.be" # {{ .Values.cloudflared.hostname }}
