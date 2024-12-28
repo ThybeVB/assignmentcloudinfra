@@ -12,3 +12,12 @@ output "cluster_id" {
 output "region" {
   value = var.region
 }
+
+/*output "generate_kubeconfig" {
+  value = "oci ce cluster create-kubeconfig --cluster-id ${oci_containerengine_cluster.oke-cluster.id} --region ${var.region} --file ./kubeconfig --token-version 2.0.0"
+}
+
+output "kubectl_usage" {
+  value = "export KUBECONFIG=./kubeconfig && kubectl get nodes"
+}
+*/

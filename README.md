@@ -28,7 +28,7 @@ docker buildx build --platform linux/amd64,linux/arm64 -t reminder-app .
 docker build -t thybevb/reminder-app:latest .
 docker images -> image id kopieren
 docker tag <image-id> thybevb/reminder-app:latest
-docker push ThybeVB/reminder-app:latest
+docker push thybevb/reminder-app:latest
 ```
 
 ## Minikube / Kubernetes
@@ -95,3 +95,11 @@ Voor aanvullende informatie over Terraform, zie [Terraform](./terraform/EXTRA_IN
 terraform apply
 
 oci ce cluster create-kubeconfig --cluster-id $(terraform output -raw cluster_id) --file $HOME/.kube/config --region $(terraform output -raw region)
+
+## Cloudflared
+
+cloudflared tunnel login
+cloudflared tunnel create example-tunnel
+kubectl create secret generic tunnel-credentials \
+--from-file=credentials.json=/home/vanbe/.cloudflared/19ecda6f-1aff-4668-a828-02af54e21b83.json
+cloudflared tunnel route dns kubernetes-tunnel cloud.thybevb.be

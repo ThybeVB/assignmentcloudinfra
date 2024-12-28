@@ -19,7 +19,7 @@ variable "availability_domain" {
 
 variable kubernetes_version {
   type = string
-  default = "v1.32"
+  default = "v1.31.1"
 }
 
 variable "public_key" {

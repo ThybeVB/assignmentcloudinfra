@@ -23,9 +23,24 @@ resource "oci_core_security_list" "worker_security_list" {
   vcn_id         = oci_core_vcn.internal.id
   display_name   = "Worker Node Security List"
 
+  # Egress
   egress_security_rules {
     destination      = "0.0.0.0/0"
     protocol         = "all"
+    stateless = false
+  }
+
+  egress_security_rules {
+    destination      = "172.16.1.0/24"
+    protocol         = "all"
+    stateless = false
+  }
+
+  # Ingress
+  ingress_security_rules {
+    source      = "172.16.1.0/24"
+    protocol         = "all"
+    stateless = false
   }
 
   ingress_security_rules {
@@ -55,6 +70,16 @@ resource "oci_core_security_list" "worker_security_list" {
     tcp_options {
       min = 80
       max = 80
+    }
+  }
+
+  ingress_security_rules {
+    protocol = "6" # tcp
+    source   = "0.0.0.0/0"
+    stateless = false
+    tcp_options {
+      min = 53
+      max = 53
     }
   }
 }

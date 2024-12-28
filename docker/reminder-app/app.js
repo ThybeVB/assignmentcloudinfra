@@ -7,11 +7,23 @@ const app = express();
 
 app.use(bodyParser.json());
 
+// Connection URI
 const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/reminders";
-mongoose.connect(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-});
+
+const connectWithRetry = async () => {
+  try {
+    await mongoose.connect(mongoUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("Connected to MongoDB");
+  } catch (err) {
+    console.error("Failed to connect to MongoDB - retrying in 5 seconds", err);
+    setTimeout(connectWithRetry, 5000);
+  }
+};
+
+connectWithRetry();
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
@@ -26,7 +38,7 @@ app.listen(PORT, () => {
 
 const Reminder = require("./models/Reminder");
 
-app.get("/reminders", async (req, res) => {
+app.get("/api/reminders", async (req, res) => {
     try {
         const reminders = await Reminder.find();
         res.json(reminders);
@@ -35,7 +47,7 @@ app.get("/reminders", async (req, res) => {
     }
 });
 
-app.post("/reminders", async (req, res) => {
+app.post("/api/reminders", async (req, res) => {
     const reminder = new Reminder({
         title: req.body.title,
         description: req.body.description,
@@ -50,7 +62,7 @@ app.post("/reminders", async (req, res) => {
     }
 });
 
-app.put("/reminders/:id", async (req, res) => {
+app.put("/api/reminders/:id", async (req, res) => {
     try {
         const reminder = await Reminder.findById(req.params.id);
         if (!reminder) return res.status(404).json({ message: "Reminder not found" });
@@ -66,7 +78,7 @@ app.put("/reminders/:id", async (req, res) => {
     }
 });
 
-app.delete("/reminders/:id", async (req, res) => {
+app.delete("/api/reminders/:id", async (req, res) => {
     try {
         const reminder = await Reminder.findById(req.params.id);
         if (!reminder) return res.status(404).json({ message: "Reminder not found" });

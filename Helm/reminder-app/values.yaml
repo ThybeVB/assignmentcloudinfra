@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: thybevb/reminder-app
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 service:
   type: ClusterIP
@@ -16,7 +16,7 @@ nginx:
     type: LoadBalancer
     port: 80
     annotations:
-      service.beta.kubernetes.io/oci-load-balancer-subnet1: "ocid1.subnet.oc1.eu-amsterdam-1.aaaaaaaalctlggapgbkmwxqny4dmlwgxdz75mrqecpfxld6nhcccc4ma66fa"
+      service.beta.kubernetes.io/oci-load-balancer-subnet1: "ocid1.subnet.oc1.eu-amsterdam-1.aaaaaaaa5rerinqmfwchvob4xhd7hfwos54644kid3ijiie33pcvfpumvatq"
 
 resources:
   limits:
