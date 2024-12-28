@@ -50,7 +50,7 @@ Met een werkende Minikube kunnen we beginnen met onze Kubernetes te maken. Om da
 
 Elk deployment bestand bevat een Deployment en een Service onderdeel. Dit kan ook opgesplist worden met een services bestand, maar ik vond dit overzichtelijker om het in hetzelfde bestand te zetten. Merk ook op dat er config bestanden zijn. Deze zijn ondersteundende configbestanden voor de deployments. We kunnen al de scripten applyen via het `apply.sh` bestand.
 
-```bash
+```sh
 #!/bin/bash
 
 # Config maken voor de MongoDB deployment
@@ -69,6 +69,7 @@ minikube kubectl -- apply -f website-configmap.yaml
 minikube kubectl -- apply -f app-deployment.yaml
 minikube kubectl -- apply -f nginx-deployment.yaml
 ```
+
 Merk op dat de volgorde hier belangrijk is. mongo-deployment kan bijvoorbeeld niet werken als het ondersteundende storage bestand nog niet werd geapplyed.
 
 Wanneer we het apply script uitvoeren worden onze pods en services gemaakt. Enkel nginx wordt exposed op onze localhost. De andere services kunnen enkel aan elkaar. 
@@ -77,6 +78,7 @@ Om de LoadBalancer nginx een External IP te geven, kunnen we `minikube tunnel` u
 
 Een kort overzicht van de runnende pods en services:
 ![Pods](./md-images/pods.png)
+
 ![Services](./md-images/svc.png)
 
 In de web browser van de host zien we onze werkende website.
@@ -84,22 +86,44 @@ In de web browser van de host zien we onze werkende website.
 
 ## Helm
 
-$ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-$ chmod 700 get_helm.sh
-$ ./get_helm.sh
+```sh
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+```
+
+Met Helm zullen we onze voordien gemaakte Kubernetes files omzetten in charts. Een helm chart vergeleken met een kubernetes file is heel gelijkaardig. Het enige verschil is dat het file een soort template wordt, met values die kunnen worden ingevoerd in values.yaml. Ook bevat een Helm project een Chart.yaml bestand met informatie over het project.
+In de files kan je bijvoorbeeld /reminder-app/ zien. Die kunnen we makkelijk deployen op de K8s cluster met `helm install reminder-app`
+Dit kunnen we dan ook doen voor Cloudflared om onze nginx te tunnelen. 
 
 ## Terraform
 
 Voor aanvullende informatie over Terraform, zie [Terraform](./terraform/EXTRA_INFO.md)
 
-terraform apply
+Wanneer we al onze Terraform scripts gemaakt hebben, kunenn we de te-maken veranderingen zien met terraform plan. Dan kunnen we deze deployen met terraform apply.
 
-oci ce cluster create-kubeconfig --cluster-id $(terraform output -raw cluster_id) --file $HOME/.kube/config --region $(terraform output -raw region)
+Met de outputs kunnen we met de OCI command line nu ook een 'kubectl' krijgen om onze cluster te manipuleren.
+`oci ce cluster create-kubeconfig --cluster-id $(terraform output -raw cluster_id) --file $HOME/.kube/config --region $(terraform output -raw region)`
+
+De volgende zaken worden zo gedeployed:
+- OCI infrastructuur
+  - VCN
+  - K8s Cluster
+  - Node pool met daarin drie worker nodes
+  - Worker Security List
+  - IGW & Route table
+- Helm charts
+  - Reminder App
+  - Cloudflared tunnel
 
 ## Cloudflared
 
+Met de cli van cloudflared kunnen we op een willekeurige client inloggen en een tunnel aanmaken. Dan maken we via onze kubectl een nieuwe secret met de credentials van de tunnel.
+
+```sh
 cloudflared tunnel login
 cloudflared tunnel create example-tunnel
 kubectl create secret generic tunnel-credentials \
 --from-file=credentials.json=/home/vanbe/.cloudflared/19ecda6f-1aff-4668-a828-02af54e21b83.json
 cloudflared tunnel route dns kubernetes-tunnel cloud.thybevb.be
+```
