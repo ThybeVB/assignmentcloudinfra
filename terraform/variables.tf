@@ -54,7 +54,7 @@ variable "os_image_id" {
 }
 
 variable "shape" {
-  default = "VM.Standard.A1.Flex"
+  type = string
 }
 
 variable "memory_in_gbs" {

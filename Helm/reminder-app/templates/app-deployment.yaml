@@ -29,7 +29,7 @@ metadata:
   name: {{ .Release.Name }}-app-service
 spec:
   selector:
-    app: {{ .Release.Name }}-app 
+    app: {{ .Release.Name }}-app
   ports:
   - protocol: TCP
     port: 3000
