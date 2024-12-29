@@ -9,7 +9,7 @@ In deze repository beschrijven we het proces van een simpele Node.js app naar ee
 De eigenlijke app is gemaakt met HTML, CSS en Javascript. De website maakt gebruik van Bootstrap om een simpele weergave te geven van herinneringen. Die herinneringen kan je met een CRUD-systeem creëren, aanpassen en verwijderen. Die CRUD aanvragen worden gestuurd naar een express.js backend. In deze backend worden de requests behandeld en verwerkt in een MongoDB database.
 De webapp bestaat dus uit volgende delen:
 
--   Frontend (HTML, CSS, JS)
+-   Frontend (HTML, CSS, JS) -> Nginx
 -   Backend (Node.js - Express)
 -   Database (MongoDB - Mongoose)
 
@@ -20,7 +20,7 @@ Om onze webapp te Dockerizen, moeten we voor de gebruikte services een Dockerfil
 Voorlopig zijn er in onze docker-compose drie services. Twee daarvan worden rechtstreeks gepulled van Docker Hub. De laatste, onze app zelf, wordt zelf gemaakt via een Dockerfile. Deze zullen we builden in een image.
 Volgende commando's worden hiervoor gebruikt. (working directory is `/docker/reminder-app/`)
 
-```console
+```bash
 docker buildx create --use
 docker buildx build --platform linux/amd64,linux/arm64 -t reminder-app .
 
@@ -35,11 +35,11 @@ docker push thybevb/reminder-app:latest
 
 Om Minikube te installeren (in mijn geval op WSL2 Ubuntu), moet ook Docker Engine draaien op de machine om als driver te werken bij Minikube. Daarna kunnen we Minikube starten.
 
-```console
+```bash
 minikube start --driver=docker
 ```
 
-Met een werkende Minikube kunnen we beginnen met onze Kubernetes te maken. Om dat we in het deel over Docker onze image hebben gepushed op Docker Hub, kan ik in Kubernetes een deployment file maken hiervoor. Dit kan ook voor onze andere nodige services; mongo en nginx. Dit is een overzicht van de gemaakte bestanden:
+Met een werkende Minikube kunnen we beginnen met onze Kubernetes te maken. Om dat we in het deel over Docker onze image hebben gepushed op Docker Hub, kan ik in Kubernetes een deployment file maken hiervoor. Dit kan ook voor onze andere nodige services; mongo en nginx. Dit is een overzicht van de [gemaakte bestanden](./K8s/):
 
 - app-deployment.yaml
 - mongo-deployment.yaml
@@ -50,7 +50,7 @@ Met een werkende Minikube kunnen we beginnen met onze Kubernetes te maken. Om da
 
 Elk deployment bestand bevat een Deployment en een Service onderdeel. Dit kan ook opgesplist worden met een services bestand, maar ik vond dit overzichtelijker om het in hetzelfde bestand te zetten. Merk ook op dat er config bestanden zijn. Deze zijn ondersteundende configbestanden voor de deployments. We kunnen al de scripten applyen via het `apply.sh` bestand.
 
-```sh
+```bash
 #!/bin/bash
 
 # Config maken voor de MongoDB deployment
@@ -84,16 +84,30 @@ Een kort overzicht van de runnende pods en services:
 In de web browser van de host zien we onze werkende website.
 ![Website in Minikube](./md-images/minikube-site.png)
 
+## Cloudflared
+
+Met de cli van cloudflared kunnen we op een willekeurige client inloggen en een tunnel aanmaken. Dan maken we via onze kubectl een nieuwe secret met de credentials van de tunnel.
+
+```bash
+cloudflared tunnel login
+cloudflared tunnel create example-tunnel
+kubectl create secret generic tunnel-credentials \
+--from-file=credentials.json=/home/vanbe/.cloudflared/19ecda6f-1aff-4668-a828-02af54e21b83.json
+cloudflared tunnel route dns kubernetes-tunnel cloud.thybevb.be
+```
+
+Na een tunnel te maken kan een Kubernetes/Helm [deployment](./Helm/cloudflared/) opgesteld worden, in de volgende stap.
+
 ## Helm
 
-```sh
+```bash
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 chmod 700 get_helm.sh
 ./get_helm.sh
 ```
 
 Met Helm zullen we onze voordien gemaakte Kubernetes files omzetten in charts. Een helm chart vergeleken met een kubernetes file is heel gelijkaardig. Het enige verschil is dat het file een soort template wordt, met values die kunnen worden ingevoerd in values.yaml. Ook bevat een Helm project een Chart.yaml bestand met informatie over het project.
-In de files kan je bijvoorbeeld /reminder-app/ zien. Die kunnen we makkelijk deployen op de K8s cluster met `helm install reminder-app`
+In de [files](./Helm/) kan je bijvoorbeeld /reminder-app/ zien. Die kunnen we makkelijk deployen op de K8s cluster met `helm install reminder-app`
 Dit kunnen we dan ook doen voor Cloudflared om onze nginx te tunnelen. 
 
 ## Terraform
@@ -106,24 +120,31 @@ Met de outputs kunnen we met de OCI command line nu ook een 'kubectl' krijgen om
 `oci ce cluster create-kubeconfig --cluster-id $(terraform output -raw cluster_id) --file $HOME/.kube/config --region $(terraform output -raw region)`
 
 De volgende zaken worden zo gedeployed:
-- OCI infrastructuur
+- [OCI infrastructuur](./terraform/kubernetes.tf)
   - VCN
   - K8s Cluster
   - Node pool met daarin drie worker nodes
   - Worker Security List
   - IGW & Route table
-- Helm charts
+- [Helm charts](./terraform/helm.tf)
   - Reminder App
   - Cloudflared tunnel
 
-## Cloudflared
+  ![Runnings Pods & Services](./md-images/pods-svc.png)
 
-Met de cli van cloudflared kunnen we op een willekeurige client inloggen en een tunnel aanmaken. Dan maken we via onze kubectl een nieuwe secret met de credentials van de tunnel.
+  Na het uitvoeren van een apply wordt onze infrastructuur gemaakt. Als die gemaakt is wordt ook Cloudflare en de Reminder App gedeployed via de helm charts.
 
-```sh
-cloudflared tunnel login
-cloudflared tunnel create example-tunnel
-kubectl create secret generic tunnel-credentials \
---from-file=credentials.json=/home/vanbe/.cloudflared/19ecda6f-1aff-4668-a828-02af54e21b83.json
-cloudflared tunnel route dns kubernetes-tunnel cloud.thybevb.be
-```
+  ## Prometheus - Grafana
+
+  Om dat de monitoringtool niet uitgevoerd mag worden op de cluster zelf, zal ik Grafana Cloud gebruiken om mijn Dashboard op te stellen. Er bestaat een door Oracle gemaakte plugin om gegevens van OCI op te vragen in Grafana.
+
+  [OCI Metrics Datasource](https://grafana.com/grafana/plugins/oci-metrics-datasource/)
+
+  We maken een account in Grafana Cloud, voegen de OCI Metrics plugin toe en voegen de Datasource toe. Hier worden eerder gebruikte gegevens gevraagd zoals het Compartment ID, fingerprint etc.. Deze kunnen gevonden worden in het config bestand van de OCI CLI.
+  Dan maken we een dashboard.
+
+  ![Grafana Dashboard](./md-images/grafana.png)
+
+  ## Ansible
+
+  Tijd om alles in Ansible op te nemen.
