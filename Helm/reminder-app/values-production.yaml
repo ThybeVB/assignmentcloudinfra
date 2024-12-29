@@ -16,15 +16,15 @@ nginx:
     port: 80
     annotations:
       service.beta.kubernetes.io/oci-load-balancer-subnet1: "ocid1.subnet.oc1.eu-amsterdam-1.aaaaaaaa5rerinqmfwchvob4xhd7hfwos54644kid3ijiie33pcvfpumvatq"
-      #service.beta.kubernetes.io/oci-load-balancer-subnet2: "" Als verschillende regio's gekozen worden
+      #service.beta.kubernetes.io/oci-load-balancer-subnet2: "" Als verschillende regio's gekozen worden ocid1.subnet.oc1.eu-amsterdam-1.aaaaaaaa5rerinqmfwchvob4xhd7hfwos54644kid3ijiie33pcvfpumvatq
 
 resources:
   limits:
-    cpu: 1
+    cpu: 1024m
     memory: 2048Mi
   requests:
-    cpu: 1
-    memory: 512Mi
+    cpu: 1024m
+    memory: 64Mi
 
 nodeSelector: {}
 

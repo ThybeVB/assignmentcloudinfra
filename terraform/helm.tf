@@ -4,18 +4,15 @@ resource "helm_release" "reminder_app" {
   namespace  = "default"
 
   values = [
-    file("../Helm/reminder-app/values.yaml")
+    file("../Helm/reminder-app/values-production.yaml")
   ]
 
   set {
-    name  = "replicaCount"
-    value = 1
+    name  = "nginx.service.annotations.service\\.beta\\.kubernetes\\.io/oci-load-balancer-subnet1"
+    value = oci_core_subnet.worker_subnet.id
   }
 
-  set {
-    name  = "image.tag"
-    value = "latest"
-  }
+  depends_on = [oci_core_subnet.worker_subnet]
 }
 
 resource "helm_release" "cloudflared" {
@@ -26,16 +23,6 @@ resource "helm_release" "cloudflared" {
   values = [
     file("../Helm/cloudflared/values.yaml")
   ]
-
-  set {
-    name  = "replicaCount"
-    value = 1
-  }
-
-  set {
-    name  = "image.tag"
-    value = "latest"
-  }
 }
 
 resource "helm_release" "vault" {
