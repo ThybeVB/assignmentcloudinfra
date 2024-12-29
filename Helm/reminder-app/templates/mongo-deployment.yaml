@@ -5,7 +5,7 @@ metadata:
   labels:
     app: {{ .Release.Name }}-mongo
 spec:
-  replicas: 1
+  replicas: {{ .Values.mongo.replicaCount }}
   selector:
     matchLabels:
       app: {{ .Release.Name }}-mongo
@@ -19,7 +19,7 @@ spec:
         image: {{ .Values.mongo.image }}
         args: ["--bind_ip_all"]
         ports:
-        - containerPort: 27017
+        - containerPort: {{ .Values.mongo.service.port }}
         #env:
         #- name: MONGO_INITDB_ROOT_USERNAME
         #  valueFrom:
@@ -34,16 +34,10 @@ spec:
         volumeMounts:
         - mountPath: /data/db
           name: mongo-storage
-        #- mountPath: /etc/mongo/mongod.conf
-        #  subPath: mongod.conf
-        #  name: mongod-config
       volumes:
       - name: mongo-storage
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-mongo-pvc
-      #- name: mongod-config
-      #  configMap:
-      #    name: {{ .Release.Name }}-mongod-config
 ---
 apiVersion: v1
 kind: Service
@@ -54,6 +48,6 @@ spec:
     app: {{ .Release.Name }}-mongo
   ports:
   - protocol: TCP
-    port: 27017
-    targetPort: 27017
-  type: ClusterIP
+    port: {{ .Values.mongo.service.port }}
+    targetPort: {{ .Values.mongo.service.port }}
+  type: {{ .Values.mongo.service.type }}

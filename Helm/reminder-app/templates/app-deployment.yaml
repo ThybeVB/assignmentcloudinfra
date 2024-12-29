@@ -5,7 +5,7 @@ metadata:
   labels:
     app: {{ .Release.Name }}-app
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.node.replicaCount }}
   selector:
     matchLabels:
       app: {{ .Release.Name }}-app 
@@ -16,9 +16,9 @@ spec:
     spec:
       containers:
       - name: app
-        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        image: {{ .Values.node.image.repository }}:{{ .Values.node.image.tag }}
         ports:
-        - containerPort: 3000
+        - containerPort: {{ .Values.node.service.port }}
         env:
         - name: MONGO_URI
           value: "mongodb://{{ .Release.Name }}-mongo-service:27017/reminders"
@@ -32,6 +32,6 @@ spec:
     app: {{ .Release.Name }}-app
   ports:
   - protocol: TCP
-    port: 3000
-    targetPort: 3000
-  type: {{ .Values.service.type }}
+    port: {{ .Values.node.service.port }}
+    targetPort: {{ .Values.node.service.port }}
+  type: {{ .Values.node.service.type }}

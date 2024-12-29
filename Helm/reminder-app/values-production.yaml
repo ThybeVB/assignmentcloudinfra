@@ -1,30 +1,30 @@
-replicaCount: 1
-
-image:
-  repository: thybevb/reminder-app
-  tag: latest
-  pullPolicy: Always
-
-service:
-  type: ClusterIP
-  port: 3000
+node:
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 3000
+  image:
+    repository: thybevb/reminder-app
+    tag: latest
+    pullPolicy: Always
 
 nginx:
-  replicas: 1
+  replicaCount: 1
   image: nginx:latest
   service:
     type: LoadBalancer
     port: 80
     annotations:
       service.beta.kubernetes.io/oci-load-balancer-subnet1: "ocid1.subnet.oc1.eu-amsterdam-1.aaaaaaaa5rerinqmfwchvob4xhd7hfwos54644kid3ijiie33pcvfpumvatq"
+      #service.beta.kubernetes.io/oci-load-balancer-subnet2: "" Als verschillende regio's gekozen worden
 
 resources:
   limits:
-    cpu: 1024m
+    cpu: 1
     memory: 2048Mi
   requests:
-    cpu: 1024m
-    memory: 64Mi
+    cpu: 1
+    memory: 512Mi
 
 nodeSelector: {}
 
@@ -34,5 +34,9 @@ affinity: {}
 
 mongo:
   image: mongo:6.0
+  replicaCount: 1
   pvc:
     storage: 2Gi
+  service:
+    type: ClusterIP
+    port: 27017

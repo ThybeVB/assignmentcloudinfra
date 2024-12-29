@@ -5,7 +5,7 @@ metadata:
   labels:
     app: {{ .Release.Name }}-nginx
 spec:
-  replicas: {{ .Values.nginx.replicas }}
+  replicas: {{ .Values.nginx.replicaCount }}
   selector:
     matchLabels:
       app: {{ .Release.Name }}-nginx
@@ -18,7 +18,7 @@ spec:
       - name: nginx
         image: {{ .Values.nginx.image }}
         ports:
-        - containerPort: 80
+        - containerPort: {{ .Values.nginx.service.port }}
         volumeMounts:
         - name: website-files
           mountPath: /usr/share/nginx/html
@@ -46,6 +46,6 @@ spec:
     app: {{ .Release.Name }}-nginx
   ports:
   - protocol: TCP
-    port: 80
-    targetPort: 80
-  type: LoadBalancer
+    port: {{ .Values.nginx.service.port }}
+    targetPort: {{ .Values.nginx.service.port }}
+  type: {{ .Values.nginx.service.type }}
