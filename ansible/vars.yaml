@@ -1,0 +1,7 @@
+# Docker
+docker_user: thybevb
+docker_image_name: reminder-app
+docker_image_tag: latest
+
+# Helm
+ansible_user: vanbe

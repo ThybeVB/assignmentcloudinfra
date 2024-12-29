@@ -1,0 +1,39 @@
+---
+- name: Deploy Helm Chart to Kubernetes Cluster
+  hosts: localhost
+  tasks:  
+    - name: Check if Helm is installed
+      command: helm version
+      register: helm_check
+      failed_when: false
+      ignore_errors: true
+
+    - name: Install Helm if not installed
+      when: helm_check.failed
+      block:
+        - name: Download Helm binary
+          get_url:
+            url: "https://get.helm.sh/helm-v3.16.4-linux-amd64.tar.gz"
+            dest: "/tmp/helm.tar.gz"
+
+        - name: Extract Helm binary
+          unarchive:
+            src: "/tmp/helm.tar.gz"
+            dest: "/tmp/"
+            remote_src: yes
+
+        - name: Move Helm to /usr/local/bin
+          command: mv /tmp/linux-amd64/helm /usr/local/bin/helm
+          become: yes
+
+    - name: Verify Helm installation
+      command: helm version
+
+    - name: Deploy Helm Chart
+      command: helm upgrade --install reminder-app ../Helm/reminder-app/ --kubeconfig "{{ lookup('env', 'HOME') }}/.kube/config"
+      register: helm_output
+
+
+    - name: Display Helm Deployment Output
+      debug:
+        var: helm_output.stdout

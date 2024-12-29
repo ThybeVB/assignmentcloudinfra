@@ -1,0 +1,13 @@
+---
+- name: Build, tag, and push Docker image
+  hosts: localhost
+  vars_files:
+    - vars.yaml
+  tasks:
+    - name: Build Docker image
+      command: docker build -t {{ docker_user }}/{{ docker_image_name }}:{{ docker_image_tag }} .
+      args:
+        chdir: "../docker/reminder-app/"
+
+    - name: Push Docker image
+      command: docker push {{ docker_user }}/{{ docker_image_name }}:{{ docker_image_tag }}
