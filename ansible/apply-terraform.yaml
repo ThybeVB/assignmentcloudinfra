@@ -1,0 +1,37 @@
+---
+- name: Ensure Terraform is installed and run apply
+  hosts: localhost
+  tasks:
+    - name: Check if Terraform is installed
+      command: terraform --version
+      register: terraform_check
+      ignore_errors: yes
+
+    - name: Install Terraform if not available
+      when: terraform_check.rc != 0
+      block:
+        - name: Download Terraform binary
+          get_url:
+            url: "https://releases.hashicorp.com/terraform/1.10.2/terraform_1.10.2_linux_amd64.zip"
+            dest: "/tmp/terraform.zip"
+
+        - name: Unzip Terraform binary
+          unarchive:
+            src: "/tmp/terraform.zip"
+            dest: "/usr/local/bin/"
+            remote_src: yes
+
+        - name: Ensure Terraform binary is executable
+          file:
+            path: "/usr/local/bin/terraform"
+            mode: '0755'
+
+    - name: Initialize Terraform
+      command: terraform init
+      args:
+        chdir: "../terraform/"
+
+    - name: Run Terraform apply
+      command: terraform apply -auto-approve
+      args:
+        chdir: "../terraform/"
