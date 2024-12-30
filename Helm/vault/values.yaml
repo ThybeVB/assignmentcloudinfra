@@ -1,0 +1,14 @@
+service:
+  type: LoadBalancer
+  port: 8200
+  annotations:
+    service.beta.kubernetes.io/oci-load-balancer-subnet1: "ocid1.subnet.oc1.eu-amsterdam-1.aaaaaaaa5rerinqmfwchvob4xhd7hfwos54644kid3ijiie33pcvfpumvatq"
+
+image:
+  repository: hashicorp/vault
+  tag: "1.13.3"
+
+replicaCount: 1
+
+extraEnvironmentVars:
+  VAULT_DEV_ROOT_TOKEN_ID: "w2nE@Kv-]<]Qh7sW|Yd2!_XD#2'a"

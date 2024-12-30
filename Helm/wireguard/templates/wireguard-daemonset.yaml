@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: wireguard
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: wireguard
+  template:
+    metadata:
+      labels:
+        app: wireguard
+    spec:
+      containers:
+      - name: wireguard
+        image: ghcr.io/linuxserver/wireguard:latest
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: wireguard-config
+          mountPath: /etc/wireguard
+      volumes:
+      - name: wireguard-config
+        configMap:
+          name: wireguard-config

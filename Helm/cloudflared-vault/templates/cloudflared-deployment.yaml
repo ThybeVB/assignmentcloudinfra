@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cloudflared
+  name: cloudflared-vault
 spec:
   selector:
     matchLabels:
@@ -31,10 +31,10 @@ spec:
       volumes:
       - name: creds
         secret:
-          secretName: tunnel-credentials
+          secretName: vault-credentials
       - name: config
         configMap:
-          name: cloudflared
+          name: cloudflared-vault
           items:
           - key: config.yaml
             path: config.yaml
@@ -42,7 +42,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: cloudflared
+  name: cloudflared-vault
 data:
   config.yaml: |
     tunnel: {{ .Values.cloudflared.tunnelname }}
@@ -51,6 +51,6 @@ data:
 
     ingress:
     - hostname: {{ .Values.cloudflared.hostname }}
-      service: http://reminder-app-nginx-service.default.svc.cluster.local:80
+      service: http://vault-vault.default.svc.cluster.local:8200
 
     - service: http_status:404

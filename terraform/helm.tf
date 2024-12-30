@@ -15,6 +15,23 @@ resource "helm_release" "reminder_app" {
   depends_on = [oci_core_subnet.worker_subnet]
 }
 
+resource "helm_release" "vault" {
+  name       = "vault"
+  chart      = "../Helm/vault"
+  namespace  = "default"
+
+  values = [
+    file("../Helm/vault/values.yaml")
+  ]
+
+  set {
+    name  = "service.annotations.service\\.beta\\.kubernetes\\.io/oci-load-balancer-subnet1"
+    value = oci_core_subnet.worker_subnet.id
+  }
+
+  depends_on = [oci_core_subnet.worker_subnet]
+}
+
 resource "helm_release" "cloudflared" {
   name       = "cloudflared"
   chart      = "../Helm/cloudflared"
@@ -25,9 +42,12 @@ resource "helm_release" "cloudflared" {
   ]
 }
 
-resource "helm_release" "vault" {
-  name       = "vault"
-  repository = "https://helm.releases.hashicorp.com"
-  chart      = "vault"
+resource "helm_release" "cloudflared_vault" {
+  name       = "cloudflared-vault"
+  chart      = "../Helm/cloudflared-vault"
   namespace  = "default"
+
+  values = [
+    file("../Helm/cloudflared-vault/values.yaml")
+  ]
 }

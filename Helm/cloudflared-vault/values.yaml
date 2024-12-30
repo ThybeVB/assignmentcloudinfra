@@ -1,0 +1,3 @@
+cloudflared:
+  tunnelname: "vault-tunnel" # {{ .Values.cloudflared.tunnelname }}
+  hostname: "vault.thybevb.be" # {{ .Values.cloudflared.hostname }}

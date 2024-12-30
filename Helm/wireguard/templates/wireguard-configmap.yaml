@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wireguard-config
+  namespace: kube-system
+data:
+  wg0.conf: |
+    [Interface]
+    PrivateKey = gM++Agq0pI2mnH2wihz6oDEcnc7w3bjP/h92sB6ieWQ=
+    Address = 10.8.0.1/24
+    ListenPort = 51820
+
+    [Peer]
+    PublicKey = XFGub7LZQx/UH1F2I7hmSJ0S85vOP2nKEBboltqElwE=
+    AllowedIPs = 10.8.0.2/32
