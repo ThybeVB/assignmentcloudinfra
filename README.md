@@ -48,6 +48,8 @@ docker tag <image-id> thybevb/reminder-app:latest
 docker push thybevb/reminder-app:latest
 ```
 
+Je kan de bestanden [hier](./docker/reminder-app/) zien.
+
 ## Minikube / Kubernetes
 
 Om Minikube te installeren (in mijn geval op WSL2 Ubuntu), moet ook Docker Engine draaien op de machine om als driver te werken bij Minikube. Daarna kunnen we Minikube starten:
@@ -164,6 +166,8 @@ De volgende zaken worden zo gedeployed:
   - Reminder App
   - Cloudflared tunnel
 
+  Je kan het Terraform project [hier](./terraform/) zien
+
 ![Runnings Pods & Services](./md-images/pods-svc.png)
 
 Na het uitvoeren van een `terraform apply` wordt onze infrastructuur gemaakt. Als die gemaakt is, wordt ook Cloudflare en de Reminder App gedeployed via de Helm charts.
@@ -186,7 +190,7 @@ We maken een account in Grafana Cloud, voegen de OCI Metrics plugin toe en voege
 
 ## Ansible
 
-In Ansible heb ik drie playbooks geschreven:
+In Ansible heb ik drie [playbooks](./ansible/) geschreven:
 
 - `apply-helm.yaml` -> Brengt de Helm charts aan van enkel reminder-app. Deze is handig wanneer ik niet alle charts + terraform wou laten runnen.
 - `apply-terraform.yaml` -> zie uitleg hieronder
