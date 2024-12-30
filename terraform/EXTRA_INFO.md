@@ -22,10 +22,10 @@ bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scrip
 ```
 
 Eenmaal de CLI is geïnstalleerd, kunnen we de sessie met OCI initializeren.
-![Terraform OCI Config 1](./md-images/terraform_oci_config1.png)
+![Terraform OCI Config 1](../md-images/terraform_oci_config1.png)
 
 Door een tutorial van OCI/Terraform te volgen maken we een basisconfiguratie voor het deployen met OCI. De SecurityToken wordt gehaald uit de machine met de cli, en de compartment_id wordt gehaald uit een `secrets.auto.tfvars` file.
 
 Na ```terraform apply``` uit te voeren zien we dat in Oracle een VCN werd gemaakt.
-![VCN Created](./md-images/terraform-vcn-1.png.png)
+![VCN Created](../md-images/terraform-vcn-1.png.png)
 

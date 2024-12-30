@@ -1,6 +1,26 @@
 # Cloud Infrastructure - Reminder App
 
+## Inhoudsopgave
+
+- [Reminder App](#reminder-app)
+- [Docker](#docker)
+- [Minikube / Kubernetes](#minikube--kubernetes)
+- [Cloudflared](#cloudflared)
+- [Helm](#helm)
+- [Terraform](#terraform)
+- [Prometheus - Grafana](#prometheus---grafana)
+- [Ansible](#ansible)
+- [Gemaakte keuzes](#gemaakte-keuzes)
+- [Besluit](#besluit)
+
+## Overzicht
+
 In deze repository beschrijven we het proces van een simpele Node.js app naar een applicatie die als cluster kan worden gedeployed. Dit evolueert doorheen verschillende software oplossingen. Standaard wordt een WSL2 Ubuntu 24.04 machine gebruikt om alle commando's uit te voeren. 
+
+Links:
+
+  - [https://cloud.thybevb.be/](https://cloud.thybevb.be/)
+  - [https://vault.thybevb.be/](https://vault.thybevb.be/)
 
 ## Reminder App
 
@@ -175,6 +195,14 @@ In Ansible heb ik drie playbooks geschreven:
 ![Applying Terraform](./md-images/ansible_terraform.png)
 
 In bovenstaande foto zie je `apply-terraform.yaml`, het grootste playbook. Dit playbook voert de Terraform bundel uit, die zelf ook de Helm bundel uitvoert. Dan maakt hij nog via de cli van OCI een kubectl aan met de outputs van Terraform.
+
+# Gemaakte keuzes
+
+Ik koos Cloudflare als tunneling service over Traefik door de eenvoud. Cloudflare heeft een robuste documentatie, zelfs een voor Kubernetes specifiek. Met hun guide kon ik mijn helm chart maken en heel gemakkelijk mijn nginx service tunnelen.
+
+Ik koos Grafana Cloud met OCI plugin over een lokale installatie om dat als ik het met mijn cluster zou deployen, is de monitoringdienst niet echt extern. Als de cluster zou uitvallen, valt ook de monitoring dienst uit. Aangezien dit extern best gemonitored wordt, kies ik voor Grafana Cloud. Dit vergemakkelijkt ook de configuratie.
+
+Bij Helm had ik de keuze om dit te deployen in Ansible of in Terraform. Ik koos Terraform om dat er maar een paar regels nodig zijn om een volledige helm chart te deployen met makkelijk customizable variabelen die je gewoon kan meegeven.
 
 # Besluit
 
