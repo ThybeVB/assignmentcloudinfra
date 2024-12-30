@@ -15,7 +15,7 @@
 
 ## Overzicht
 
-In deze repository beschrijven we het proces van een simpele Node.js app naar een applicatie die als cluster kan worden gedeployed. Dit evolueert doorheen verschillende software oplossingen. Standaard wordt een WSL2 Ubuntu 24.04 machine gebruikt om alle commando's uit te voeren. 
+In deze repository wordt het proces beschreven om een eenvoudige Node.js-app te transformeren naar een applicatie die in een cluster kan worden gedeployed. Dit proces maakt gebruik van verschillende software-oplossingen en wordt uitgevoerd op een WSL2 Ubuntu 24.04-machine.
 
 Links:
 
@@ -24,7 +24,7 @@ Links:
 
 ## Reminder App
 
-De eigenlijke app is gemaakt met HTML, CSS en Javascript. De website maakt gebruik van Bootstrap om een simpele weergave te geven van herinneringen. Die herinneringen kan je met een CRUD-systeem creëren, aanpassen en verwijderen. Die CRUD-aanvragen worden gestuurd naar een Express.js backend. In deze backend worden de requests behandeld en verwerkt in een MongoDB database.
+De Reminder App is een webapplicatie gebouwd met HTML, CSS, en JavaScript. Het gebruikt Bootstrap voor de front-end en een Node.js-Express backend voor het verwerken van CRUD-verzoeken. De backend communiceert met een MongoDB-database via Mongoose.
 
 De webapp bestaat dus uit de volgende delen:
 
@@ -38,16 +38,16 @@ Om onze webapp te dockerizen, moeten we voor de gebruikte services een Dockerfil
 
 Voorlopig zijn er in onze docker-compose drie services. Twee daarvan worden rechtstreeks gepulled van Docker Hub. De laatste, onze app zelf, wordt zelf gemaakt via een Dockerfile. Deze zullen we builden in een image.
 
-Volgende commando's worden hiervoor gebruikt (working directory is `/docker/reminder-app/`):
+1. **Maak een Dockerfile** voor de backend.
+2. **Maak een Docker Compose file** om services te coördineren.
+3. **Push de image naar Docker Hub:**
 
 ```bash
-# Pushen naar Docker Hub
 docker build -t thybevb/reminder-app:latest .
-docker images -> image id kopiëren
+docker images # Image ID kopiëren
 docker tag <image-id> thybevb/reminder-app:latest
 docker push thybevb/reminder-app:latest
 ```
-
 Je kan de bestanden [hier](./docker/reminder-app/) zien.
 
 ## Minikube / Kubernetes
@@ -160,6 +160,9 @@ De volgende zaken worden zo gedeployed:
   - VCN
   - K8s Cluster
   - Node pool met daarin drie worker nodes
+    - Oracle Linux 7.9, optimised voor OKE
+    - 2 cores, 16gb ram
+    - Public key wordt meegegeven bij creatie 
   - Worker Security List
   - IGW & Route table
 - **Helm charts**
