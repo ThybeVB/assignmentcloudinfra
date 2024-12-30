@@ -118,6 +118,7 @@ helm install reminder-app
 ```
 
 Dit kunnen we dan ook doen voor Cloudflared om onze Nginx te tunnelen.
+Ook wordt een Helm chart gemaakt voor de Vault. Die krijgt ook zijn eigen Cloudflare tunnel naar [https://vault.thybevb.be/](https://vault.thybevb.be/).
 
 ## Terraform
 
@@ -147,6 +148,12 @@ De volgende zaken worden zo gedeployed:
 
 Na het uitvoeren van een `terraform apply` wordt onze infrastructuur gemaakt. Als die gemaakt is, wordt ook Cloudflare en de Reminder App gedeployed via de Helm charts.
 
+In de foto zie je de gedeployede reminder-app met werkende cloudflare en databaseverbinding.
+![Werkende deployment cloudflare+reminderapp](./md-images/deployed.png)
+
+De API werd via nginx verwezen naar /api/. Zo moeten we de NodeJS service niet exposen.
+![API](./md-images/api.png)
+
 ## Prometheus - Grafana
 
 Omdat de monitoringtool niet uitgevoerd mag worden op de cluster zelf, zal ik Grafana Cloud gebruiken om mijn dashboard op te stellen. Er bestaat een door Oracle gemaakte plugin om gegevens van OCI op te vragen in Grafana.
@@ -161,12 +168,14 @@ We maken een account in Grafana Cloud, voegen de OCI Metrics plugin toe en voege
 
 In Ansible heb ik drie playbooks geschreven:
 
-- `apply-helm.yaml`
-- `apply-terraform.yaml`
-- `push-docker-app.yaml`
+- `apply-helm.yaml` -> Brengt de Helm charts aan van enkel reminder-app. Deze is handig wanneer ik niet alle charts + terraform wou laten runnen.
+- `apply-terraform.yaml` -> zie uitleg hieronder
+- `push-docker-app.yaml` -> Brengt een nieuwe update uit op Docker Hub van reminder-app
 
 ![Applying Terraform](./md-images/ansible_terraform.png)
 
-In bovenstaande foto zie je `apply-terraform.yaml`, het grootste playbook. Dit playbook voert de Terraform bundel uit, die zelf ook de Helm bundel uitvoert.
+In bovenstaande foto zie je `apply-terraform.yaml`, het grootste playbook. Dit playbook voert de Terraform bundel uit, die zelf ook de Helm bundel uitvoert. Dan maakt hij nog via de cli van OCI een kubectl aan met de outputs van Terraform.
 
 # Besluit
+
+Deze opdracht was een mix van heel wat Cloud talen en infrastructuur oplossingen. Het heeft me in het bijzonder heel veel bijgeleerd over Kubernetes en Terraform. Terraform vond ik ook het leukste om te gebruiken. Ik zat ongeveer 19 uur vast aan een probleem dat mijn worker nodes elkaar niet konden vinden. Althans, ze vonden elkaar DNS niet. Het bijzondere was dat ze dit ongeveer 1/3e van de keren wel konden. Uiteindelijk lag het probleem bij de firewall van de worker subnet. Door deze zaken heb ik heel veel bijgeleerd over IaC.

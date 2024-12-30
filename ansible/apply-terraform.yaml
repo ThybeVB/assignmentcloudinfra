@@ -1,5 +1,5 @@
 ---
-- name: Ensure Terraform is installed and run apply
+- name: Install Terraform, apply configuration, and create kubeconfig
   hosts: localhost
   tasks:
     - name: Check if Terraform is installed
@@ -35,3 +35,22 @@
       command: terraform apply -auto-approve
       args:
         chdir: "../terraform/"
+
+    - name: Get Terraform cluster_id output
+      command: terraform output -raw cluster_id
+      args:
+        chdir: "../terraform/"
+      register: cluster_id
+
+    - name: Get Terraform region output
+      command: terraform output -raw region
+      args:
+        chdir: "../terraform/"
+      register: region
+
+    - name: Create kubeconfig using OCI CLI
+      command: >
+        oci ce cluster create-kubeconfig
+        --cluster-id {{ cluster_id.stdout }}
+        --file $HOME/.kube/config
+        --region {{ region.stdout }}
