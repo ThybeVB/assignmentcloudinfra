@@ -3,13 +3,13 @@
 ## Inhoudsopgave
 
 - [Reminder App](#reminder-app)
-- [Docker](#docker)
-- [Minikube / Kubernetes](#minikube--kubernetes)
-- [Cloudflared](#cloudflared)
-- [Helm](#helm)
-- [Terraform](#terraform)
-- [Prometheus - Grafana](#prometheus---grafana)
-- [Ansible](#ansible)
+  - [Docker](#docker)
+  - [Minikube / Kubernetes](#minikube--kubernetes)
+  - [Cloudflared](#cloudflared)
+  - [Helm](#helm)
+  - [Terraform](#terraform)
+  - [Prometheus - Grafana](#prometheus---grafana)
+  - [Ansible](#ansible)
 - [Gemaakte keuzes](#gemaakte-keuzes)
 - [Besluit](#besluit)
 
